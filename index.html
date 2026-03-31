@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>CAPTCHOUM™</title>
+  <link rel="stylesheet" href="reset.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <canvas id="particles"></canvas>
+
+  <!-- Carte principale -->
+  <div class="card" id="main-card">
+    <div class="badge">
+      Propulsé par CAPTCHIA™ &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; Preuve
+      d'humanité biologique
+    </div>
+
+    <h1>Prouve que tu es <em>humain</em></h1>
+    <p class="subtitle">
+      Les robots ne peuvent pas éternuer. Toi, si. &mdash; Alors, go, lâche
+      tout.
+    </p>
+
+    <div class="instructions">
+      🎙️ Clique sur <strong>"Activer le micro"</strong>, puis
+      <strong>éternue le plus fort possible</strong> dans ton micro.<br />
+      Dépasse le seuil rouge pour valider ton accès.
+      <strong>Atchoum !</strong>
+    </div>
+
+    <span class="sneeze-emoji" id="emoji">😐</span>
+
+    <div class="volume-wrap">
+      <div class="volume-label">VOLUME <span id="vol-pct">0%</span></div>
+      <div class="bar-bg">
+        <div class="bar-fill" id="bar-fill"></div>
+        <div class="threshold-line" id="threshold-line"></div>
+      </div>
+    </div>
+
+    <p class="status" id="status-text">
+      En attente du micro…
+    </p>
+
+    <button class="btn" id="main-btn">
+      🎙️ Activer le micro
+    </button>
+
+    <p class="footer-note">
+      Aucun son n'est enregistré ni transmis. Tout est local.<br /><br />
+      <a href="poisson.html" class="btn" style="
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: #fff;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition:
+              transform 0.2s,
+              box-shadow 0.2s;
+          ">
+        📦 Appliquer sur votre site&nbsp;!
+      </a>
+    </p>
+  </div>
+
+  <!-- Superposition de succès -->
+  <div id="success-overlay">
+    <div class="success-card">
+      <span class="big-emoji">🎉</span>
+      <h2>Accès accordé !</h2>
+      <p>
+        Félicitations, ton éternuement héroïque a convaincu nos serveurs de
+        ton humanité profonde et indéniable.
+      </p>
+      <div class="peak-label" id="peak-label">
+        VOLUME ATTEINT : —
+      </div>
+      <br />
+      <button class="btn-reset" id="reset-btn">
+        ↩ Recommencer
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ─── CONFIG ───────────────────────────────────────────
+    const THRESHOLD = 0.85 // 0–1, volume nécessaire
+    const SUSTAINED_MS = 100 // durée minimale au-dessus du seuil
+    // ──────────────────────────────────────────────────────
+
+    const mainBtn = document.getElementById("main-btn")
+    const barFill = document.getElementById("bar-fill")
+    const volPct = document.getElementById("vol-pct")
+    const statusText = document.getElementById("status-text")
+    const emoji = document.getElementById("emoji")
+    const threshLine = document.getElementById("threshold-line")
+    const successOvl = document.getElementById("success-overlay")
+    const peakLabel = document.getElementById("peak-label")
+    const resetBtn = document.getElementById("reset-btn")
+    const card = document.getElementById("main-card")
+
+    // Positionne la ligne de seuil
+    threshLine.style.left = THRESHOLD * 100 + "%"
+
+    let audioCtx, analyser, source, animId
+    let aboveThresholdSince = null
+    let peakVolume = 0
+    let listening = false
+    let validated = false
+
+    const EMOJIS_IDLE = ["😐", "😶", "🙄"]
+    const EMOJIS_LOW = ["😊", "😄", "😮"]
+    const EMOJIS_MED = ["🤧", "😤", "🥴"]
+    const EMOJIS_HIGH = ["🤧", "😵", "🤯"]
+    const EMOJIS_PEAK = ["🤧", "🤧", "🤧"]
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)]
+    }
+
+    function setEmoji(e, animate = false) {
+      if (emoji.textContent === e && !animate) return
+      emoji.textContent = e
+      if (animate) {
+        emoji.classList.remove("wiggle", "burst")
+        void emoji.offsetWidth
+        emoji.classList.add(e === "🤧" ? "burst" : "wiggle")
+      }
+    }
+
+    // ── Système de particules ──────────────────────────────
+    function spawnParticle(x, y, size, color) {
+      const p = document.createElement("div")
+      p.className = "particle"
+      p.style.cssText = `
+      left: ${x}px; top: ${y}px;
+      width: ${size}px; height: ${size}px;
+      background: ${color};
+      animation-duration: ${0.4 + Math.random() * 0.6}s;
+    `
+      document.body.appendChild(p)
+      p.addEventListener("animationend", () => p.remove())
+    }
+
+    function spawnParticles(count, volume) {
+      const colors = ["#ff6b2b", "#ffd166", "#06d6a0", "#fff"]
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * window.innerWidth
+        const y = Math.random() * window.innerHeight
+        const size = 3 + Math.random() * 8 * volume
+        spawnParticle(x, y, size, pickRandom(colors))
+      }
+    }
+
+    // ── Explosion de confettis ─────────────────────────────
+    function launchConfetti() {
+      const colors = ["#ff6b2b", "#ffd166", "#06d6a0", "#ef233c", "#fff"]
+      for (let i = 0; i < 60; i++) {
+        const dot = document.createElement("div")
+        dot.className = "confetti-dot"
+        const x = 20 + Math.random() * (window.innerWidth - 40)
+        const y = -10 + Math.random() * window.innerHeight * 0.5
+        dot.style.cssText = `
+        left: ${x}px; top: ${y}px;
+        background: ${pickRandom(colors)};
+        animation-delay: ${Math.random() * 0.5}s;
+        animation-duration: ${0.8 + Math.random() * 0.8}s;
+      `
+        document.body.appendChild(dot)
+        dot.addEventListener("animationend", () => dot.remove())
+      }
+    }
+
+    // ── Traitement audio ─────────────────────────────────
+    async function startListening() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
+        })
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+        analyser = audioCtx.createAnalyser()
+        analyser.fftSize = 256
+        source = audioCtx.createMediaStreamSource(stream)
+        source.connect(analyser)
+
+        listening = true
+        mainBtn.disabled = true
+        mainBtn.textContent = "🎤 Écoute en cours…"
+        statusText.textContent = "Prêt ! Éternue maintenant 🤧"
+        statusText.className = "status active"
+
+        processAudio()
+      } catch (e) {
+        statusText.textContent = "❌ Accès au micro refusé."
+        mainBtn.textContent = "🎙️ Réessayer"
+        mainBtn.disabled = false
+      }
+    }
+
+    function processAudio() {
+      const data = new Uint8Array(analyser.frequencyBinCount)
+
+      function tick() {
+        if (!listening || validated) return
+        animId = requestAnimationFrame(tick)
+
+        analyser.getByteFrequencyData(data)
+        // Volume RMS
+        let sum = 0
+        for (let v of data) sum += v * v
+        const rms = Math.sqrt(sum / data.length) / 128 // 0–1 approx
+
+        // Contraindre entre 0 et 1
+        const vol = Math.min(1, rms)
+        peakVolume = Math.max(peakVolume, vol)
+
+        // Mise à jour de l'interface
+        barFill.style.width = vol * 100 + "%"
+        volPct.textContent = Math.round(vol * 100) + "%"
+
+        // Transitions d'emoji
+        if (vol > 0.8) setEmoji(pickRandom(EMOJIS_PEAK), true)
+        else if (vol > 0.55) setEmoji(pickRandom(EMOJIS_HIGH))
+        else if (vol > 0.35) setEmoji(pickRandom(EMOJIS_MED))
+        else if (vol > 0.1) setEmoji(pickRandom(EMOJIS_LOW))
+        else setEmoji(pickRandom(EMOJIS_IDLE))
+
+        // Effet de halo sur la carte
+        if (vol > 0.3) card.classList.add("glowing")
+        else card.classList.remove("glowing")
+
+        // Particules quand c'est fort
+        if (vol > 0.3) spawnParticles(Math.floor(vol * 8), vol)
+
+        // Texte de statut
+        if (vol > THRESHOLD) {
+          statusText.textContent = "PLUS FORT !!! 💥"
+          if (!aboveThresholdSince) aboveThresholdSince = Date.now()
+          else if (Date.now() - aboveThresholdSince >= SUSTAINED_MS) {
+            triggerSuccess()
+          }
+        } else {
+          aboveThresholdSince = null
+          if (vol > 0.3) statusText.textContent = "Encore un peu ! 🤧"
+          else if (vol > 0.1) statusText.textContent = "Continue… 😤"
+          else statusText.textContent = "Prêt ! Éternue maintenant 🤧"
+        }
+      }
+
+      tick()
+    }
+
+    function triggerSuccess() {
+      validated = true
+      listening = false
+      cancelAnimationFrame(animId)
+
+      // État final
+      setEmoji("🤧", true)
+      barFill.style.width = "100%"
+      barFill.style.background = "var(--success)"
+      statusText.textContent = "VALIDÉ ! 🎉"
+      statusText.className = "status success"
+
+      // Affiche le pic
+      peakLabel.textContent = `VOLUME ATTEINT : ${Math.round(peakVolume * 100)}%`
+
+      // Délai puis affichage de l'overlay
+      setTimeout(() => {
+        launchConfetti()
+        successOvl.classList.add("show")
+      }, 400)
+    }
+
+    function reset() {
+      validated = false
+      listening = false
+      aboveThresholdSince = null
+      peakVolume = 0
+
+      if (audioCtx) {
+        audioCtx.close()
+        audioCtx = null
+      }
+
+      successOvl.classList.remove("show")
+      barFill.style.width = "0%"
+      barFill.style.background = ""
+      volPct.textContent = "0%"
+      card.classList.remove("glowing")
+      setEmoji("😐")
+      statusText.textContent = "En attente du micro…"
+      statusText.className = "status"
+      mainBtn.disabled = false
+      mainBtn.textContent = "🎙️ Activer le micro"
+    }
+
+    mainBtn.addEventListener("click", startListening)
+    resetBtn.addEventListener("click", reset)
+  </script>
+</body>
+
+</html>

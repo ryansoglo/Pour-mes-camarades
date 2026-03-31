@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Poisson d'Avril ! 🐟</title>
+    <link
+      rel="stylesheet"
+      href="reset.css" />
+    <link
+      rel="stylesheet"
+      href="styles.css" />
+    <style>
+      body {
+        background-color: #0b1d3a;
+        color: white;
+        overflow-x: hidden;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        margin: 0;
+        padding: 4rem 1rem;
+        box-sizing: border-box;
+        position: relative;
+        font-family: sans-serif;
+      }
+      .card {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        margin-bottom: 3rem;
+        max-width: 600px;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #48cae4;
+        font-family: sans-serif;
+      }
+      p {
+        font-size: 1.2rem;
+        line-height: 1.5;
+        font-family: sans-serif;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 2rem;
+        color: #ade8f4;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: 2px solid #ade8f4;
+        border-radius: 30px;
+        transition: 0.2s;
+        font-family: sans-serif;
+      }
+      .back-link:hover {
+        background: #ade8f4;
+        color: #0b1d3a;
+      }
+
+      .fish {
+        position: absolute;
+        white-space: nowrap;
+        animation: swim linear infinite;
+        z-index: 1;
+        user-select: none;
+      }
+
+      @keyframes swim {
+        from {
+          transform: translateX(110vw);
+        }
+        to {
+          transform: translateX(-20vw);
+        }
+      }
+      @keyframes swim-reverse {
+        from {
+          transform: translateX(-20vw) scaleX(-1);
+        }
+        to {
+          transform: translateX(110vw) scaleX(-1);
+        }
+      }
+
+      .bubble {
+        position: fixed;
+        bottom: -50px;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        animation: rise ease-in-out infinite;
+        z-index: 2;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2) inset;
+        pointer-events: none;
+      }
+      @keyframes rise {
+        0% {
+          transform: translateY(0) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-50vh) translateX(20px);
+        }
+        100% {
+          transform: translateY(-110vh) translateX(-20px);
+          opacity: 0;
+        }
+      }
+
+      .fun-facts {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        z-index: 10;
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+      }
+      .fun-fact-card {
+        background: rgb(1 17 43 / 90%);
+        border: 1px solid rgba(72, 202, 228, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        transition: transform 0.2s;
+      }
+      .fun-fact-card:hover {
+        /* transform: translateY(-5px); */
+        border-color: rgba(72, 202, 228, 0.7);
+      }
+      .fun-fact-icon {
+        font-size: 3rem;
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(72, 202, 228, 0.1);
+        border-radius: 50%;
+      }
+      .fun-fact-text {
+        text-align: left;
+      }
+      .fun-fact-text h3 {
+        margin: 0 0 0.5rem 0;
+        color: #ade8f4;
+        font-size: 1.3rem;
+      }
+      .fun-fact-text p {
+        margin: 0;
+        font-size: 1rem;
+        color: #caf0f8;
+      }
+
+      h2.section-title {
+        color: #48cae4;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        z-index: 10;
+        position: relative;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>🐟</h1>
+      <p>
+        Poisson d'Avril !!!😂
+        Tu as vraiment cru qu'on pouvait protéger<br />un site avec des
+        éternuements ? 🤧
+      </p>
+      <a
+        href="index.html"
+        class="back-link"
+        >↩ Retour à l'accueil</a
+      >
+    </div>
+
+    <h2 class="section-title">Fun Facts !</h2>
+    <div class="fun-facts">
+      <div class="fun-fact-card">
+        <div class="fun-fact-icon">🎮</div>
+        <div class="fun-fact-text">
+          <h3>Nintendo DS : L'âge d'or du souffle</h3>
+          <p>
+            La Nintendo DS (2004) a popularisé le micro dans le jeu vidéo ! Vous
+            pouviez éteindre des bougies d'anniversaire virtuelles, siffler pour
+            appeler votre chiot dans Nintendogs, ou encore gonfler des ballons
+            dans Mario Kart. ET RYAN AUSSI S'APPELLE MARIO !😂
+          </p>
+        </div>
+      </div>
+      <div class="fun-fact-card">
+        <div class="fun-fact-icon">😒</div>
+        <div class="fun-fact-text">
+          <h3>Avis à vous !</h3>
+          <p>
+            Je me suis vraiment creusé la tête pour vou trouver ça alors vous avez intérêt à le lire !
+          </p>
+        </div>
+      </div>
+      <div class="fun-fact-card">
+        <div class="fun-fact-icon">🕹️</div>
+        <div class="fun-fact-text">
+          <h3>Famicom : Le secret du Player 2</h3>
+          <p>
+            La Famicom, version japonaise de la NES (1983), avait un microphone
+            intégré à la manette du joueur 2 ! En criant ou soufflant dedans
+            dans le premier jeu The Legend of Zelda, vous pouviez tuer certains
+            ennemis (les créatures avec de grandes oreilles de lapin).
+          </p>
+        </div>
+      </div>
+      <div class="fun-fact-card">
+        <div class="fun-fact-icon">🕹️</div>
+        <div class="fun-fact-text">
+          <h3>Wii U (GamePad)</h3>
+          <p>
+            Le GamePad de la Wii U intégrait un micro qui a été utilisé de
+            manière très similaire. Dans certains niveaux de
+            <b>Super Mario 3D World</b>, vous deviez souffler sur le micro pour
+            faire bouger des plates-formes mobiles ou disperser des tas de
+            feuilles et de neige pour révéler des bonus. Le souffle dans
+            <b>Captain Toad: Treasure Tracker</b> permettait d'activer certains
+            mécanismes ou d'immobiliser temporairement des ennemis.
+          </p>
+        </div>
+      </div>
+      <div class="fun-fact-card">
+        <div class="fun-fact-icon">📱</div>
+        <div class="fun-fact-text">
+          <h3>Les apps "iBeer" et Compagnie</h3>
+          <p>
+            Aux débuts de l'App Store de l'iPhone, des dizaines d'applications
+            inutiles et virales utilisaient le micro : allume-cigare virtuel,
+            application Ocarina, ou bougies qu'il fallait souffler pour de vrai
+            sur l'écran !
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const fishes = [
+        "🐟",
+        "🐠",
+        "🐡",
+        "🦈",
+        "🐙",
+        "🦑",
+        "🦐",
+        "🦀",
+        "🐬",
+        "🐳",
+        "🐢",
+      ]
+
+      function spawnFish() {
+        const fish = document.createElement("div")
+        fish.className = "fish"
+        fish.textContent = fishes[Math.floor(Math.random() * fishes.length)]
+
+        const isReverse = Math.random() > 0.5
+        const duration = 10 + Math.random() * 25 // 10s to 35s
+        const depth = Math.random() * 90 // 0vh to 90vh
+        const size = 1.5 + Math.random() * 3.5 // 1.5rem to 5rem
+        const delay = Math.random() * -30 // Negative delay to start mid-animation
+
+        fish.style.top = `${depth}vh`
+        fish.style.fontSize = `${size}rem`
+        fish.style.animationName = isReverse ? "swim-reverse" : "swim"
+        fish.style.animationDuration = `${duration}s`
+        fish.style.animationDelay = `${delay}s`
+
+        // Vertical wiggle effect with a slight offset depending on the fish
+        const wiggleSpeed = 1 + Math.random() * 2
+        fish.style.transition = `transform ${wiggleSpeed}s ease-in-out`
+
+        document.body.appendChild(fish)
+      }
+
+      for (let i = 0; i < 40; i++) {
+        spawnFish()
+      }
+
+      function spawnBubble() {
+        const bubble = document.createElement("div")
+        bubble.className = "bubble"
+
+        const size = 5 + Math.random() * 25 // 5px to 30px
+        const left = Math.random() * 100 // 0vw to 100vw
+        const duration = 5 + Math.random() * 15 // 5s to 20s
+        const blur = Math.random() > 0.5 ? Math.random() * 2 : 0
+
+        bubble.style.width = `${size}px`
+        bubble.style.height = `${size}px`
+        bubble.style.left = `${left}vw`
+        bubble.style.animationDuration = `${duration}s`
+        bubble.style.filter = `blur(${blur}px)`
+
+        document.body.appendChild(bubble)
+
+        // Remove the bubble once the animation finishes
+        setTimeout(() => {
+          bubble.remove()
+        }, duration * 1000)
+      }
+
+      // Spawn initial bubbles
+      for (let i = 0; i < 20; i++) {
+        setTimeout(spawnBubble, Math.random() * 5000)
+      }
+
+      // Continuously spawn bubbles
+      setInterval(spawnBubble, 600)
+    </script>
+  </body>
+</html>
